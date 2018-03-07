@@ -173,3 +173,49 @@ def rectangular_patch(oDesign, patch_length, patch_width, probe_x, probe_y, subs
 	binarySubtraction(oDesign, [name, substrate_name, GndName],coax_names[0],True)
 	binarySubtraction(oDesign,GndName,coax_names[1],True)
 	return excitation, [name, substrate_name, GndName]+coax_names
+
+
+def square_spiral_inductor(oDesign, start_x, start_y, start_length,width, width_multiplier, spacing, num_turns, units="mm", cs="Global", name="Spiral"):
+	start_z = 0
+
+	length = start_length
+	x = start_x
+	y = start_y
+
+	# First Rectangle
+	drawRectangle(oDesign, x, y, start_z, length,width, units, "Z", cs, "Rectangle", 0)
+
+	x += length-width
+	length -= spacing
+	y += width
+
+	if length <= 0:
+		return
+
+	drawRectangle(oDesign,x,y,start_z,width,length,units,"Z",cs,"Rectangle",0)
+
+	y += length - width
+	length -= width
+	x -= length
+	if length<= 0:
+		return
+	drawRectangle(oDesign, x, y, start_z, length, width, units, "Z", cs, "Rectangle", 0)
+
+
+	length -= spacing
+	y-= length
+	if length<= 0:
+		return
+
+	drawRectangle(oDesign, x, y, start_z, width, length, units, "Z", cs, "Rectangle", 0)
+
+
+	num_turns -=1
+	x+= width
+	length -= width
+
+	if length<-0:
+		return
+
+	if num_turns>0:
+		square_spiral_inductor(oDesign,x,y,length,width_multiplier*width,width_multiplier, spacing,num_turns,units,cs,name)

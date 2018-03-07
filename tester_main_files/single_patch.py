@@ -31,8 +31,8 @@ globalCS(oDesign)  # Ensures that all relative CS are created based off global C
 name = "Patch%d" % (1)
 [temp_excitation, temp_object_names] = rectangular_patch(oDesign, patchL, patchW, probeX, probeY, subL, subW, subH,
 								"FR4_epoxy", "mm", "Global", name)
-r=wavelength
-max_r = r + subW
+r = wavelength
+max_r = np.sqrt(subW*subW+subL*subL)
 
 
 globalCS(oDesign)
