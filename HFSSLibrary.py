@@ -10,6 +10,7 @@ def openHFSS():
 	return [oAnsys, oDesktop]
 
 
+
 # Draw Polygon from corner points
 def drawPolygon(oDesign, coords, units, names, Transparency):
 	oEditor = oDesign.SetActiveEditor("3D Modeler")
@@ -30,10 +31,12 @@ def drawPolygon(oDesign, coords, units, names, Transparency):
 				"NoOfPoints:="		, 2
 			])
 
+	print(len(polyline_segments))
+
 	name = ""
 	coords.append(coords[0])
+	i=1
 	for point in coords:
-		print(point)
 		[xStr,yStr,zStr,name]=name_handler(oDesign,point,units,names)
 		polyline_points.append(["NAME:PLPoint","X:=", xStr,"Y:=", yStr,"Z:=", zStr])
 
@@ -63,9 +66,9 @@ def drawPolygon(oDesign, coords, units, names, Transparency):
 		"SolveInside:="		, True
 	]
 
-
-	oEditor.CreatePolyline([polyline_parameters],[polyline_attributes])
 	print(polyline_parameters)
+	oEditor.CreatePolyline([polyline_parameters],[polyline_attributes])
+
 
 
 
@@ -838,7 +841,7 @@ def edit_sources(oDesign,source_list,modes_list,amplitudes_list, phase_list, amp
 		phase_str_list +=['%f' %(phase_list[i]) +phase_units]
 		modes_str_list +=['%d' %(modes_list[0,i])]
 
-	print("Amplitudes\n", amplitude_str_list, "\n\nPhases\n", phase_str_list,"\n\nModes\n", modes_str_list)
+	print("\nNames:\n",source_list,"\n\nAmplitudes\n", amplitude_str_list, "\n\nPhases\n", phase_str_list,"\n\nModes\n", modes_str_list)
 	oModule = oDesign.GetModule("Solutions")
 	oModule.EditSources("TotalFields",
 						["NAME:Names"]+source_list,
