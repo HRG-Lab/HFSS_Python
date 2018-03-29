@@ -11,6 +11,7 @@ def openHFSS():
 
 
 
+# Draw Polygon from corner points
 def drawPolygon(oDesign, coords, units, names, Transparency, node_id_list = []):
 	oEditor = oDesign.SetActiveEditor("3D Modeler")
 	polyline_parameters = ["NAME:PolylineParameters","IsPolylineCovered:=", True,
