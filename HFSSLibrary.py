@@ -11,8 +11,7 @@ def openHFSS():
 
 
 
-# Draw Polygon from corner points
-def drawPolygon(oDesign, coords, units, names, Transparency):
+def drawPolygon(oDesign, coords, units, names, Transparency, node_id_list = []):
 	oEditor = oDesign.SetActiveEditor("3D Modeler")
 	polyline_parameters = ["NAME:PolylineParameters","IsPolylineCovered:=", True,
 		"IsPolylineClosed:="	, True]
@@ -20,6 +19,9 @@ def drawPolygon(oDesign, coords, units, names, Transparency):
 	polyline_points=["NAME:PolylinePoints"]
 	polyline_segments=["NAME:PolylineSegments"]
 
+	print(coords)
+	print(len(coords))
+	print(len(node_id_list))
 
 	# End point is duplicated in coords, so need this loop before the polyline_points creator loop
 	for start_index in range(len(coords)):
@@ -31,14 +33,23 @@ def drawPolygon(oDesign, coords, units, names, Transparency):
 				"NoOfPoints:="		, 2
 			])
 
-	print(len(polyline_segments))
-
 	name = ""
 	coords.append(coords[0])
-	i=1
+	if len(node_id_list)>0:
+		node_id_list.append(node_id_list[0])
 	for point in coords:
-		[xStr,yStr,zStr,name]=name_handler(oDesign,point,units,names)
-		polyline_points.append(["NAME:PLPoint","X:=", xStr,"Y:=", yStr,"Z:=", zStr])
+		if len(node_id_list)==len(coords):
+			point_index = coords.index(point)
+			node_id = int(node_id_list[point_index])
+			temp_names = ["x{0}".format(node_id),"y{0}".format(node_id),"z{0}".format(node_id),names[-1]]
+			print("new_point:",point)
+			[xStr, yStr, zStr, name] = name_handler(oDesign, point, units, temp_names)
+			polyline_points.append(["NAME:PLPoint", "X:=", xStr, "Y:=", yStr, "Z:=", zStr])
+			print(xStr,yStr,zStr)
+		else:
+			print(point)
+			[xStr, yStr, zStr, name] = name_handler(oDesign, point, units, names)
+			polyline_points.append(["NAME:PLPoint", "X:=", xStr, "Y:=", yStr, "Z:=", zStr])
 
 	polyline_parameters.append(polyline_points)
 	polyline_parameters.append(polyline_segments)
@@ -46,9 +57,9 @@ def drawPolygon(oDesign, coords, units, names, Transparency):
 		"NAME:PolylineXSection",
 		"XSectionType:=", "None",
 		"XSectionOrient:=", "Auto",
-		"XSectionWidth:=", "0mm",
-		"XSectionTopWidth:=", "0mm",
-		"XSectionHeight:=", "0mm",
+		"XSectionWidth:=", "0{0}".format(units),
+		"XSectionTopWidth:=", "0{0}".format(units),
+		"XSectionHeight:=", "0{0}".format(units),
 		"XSectionNumSegments:=", "0",
 		"XSectionBendType:=", "Corner"
 	])
@@ -66,8 +77,10 @@ def drawPolygon(oDesign, coords, units, names, Transparency):
 		"SolveInside:="		, True
 	]
 
-	print(polyline_parameters)
+
 	oEditor.CreatePolyline([polyline_parameters],[polyline_attributes])
+	print(polyline_parameters)
+
 
 
 
