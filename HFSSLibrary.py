@@ -1,6 +1,8 @@
 import win32com.client
 import numpy as np
-from DualQuaternion import *
+
+# from HFSS_Python.DualQuaternion import * # <--- uncomment this if importing submodule
+from DualQuaternion import * # <-- Comment this out if importing submodule
 
 def openHFSS():
 
@@ -9,13 +11,16 @@ def openHFSS():
 	print('Successfully Opened Desktop App\n')
 	return [oAnsys, oDesktop]
 
-
-
 # Draw Polygon from corner points
-def drawPolygon(oDesign, coords, units, names, Transparency, node_id_list = []):
+def drawPolygon(oDesign, coords, units, names = "", Transparency= 0, node_id_list = [], XSectionType = 0, XSectionDiameter = 0.0):
 	oEditor = oDesign.SetActiveEditor("3D Modeler")
-	polyline_parameters = ["NAME:PolylineParameters","IsPolylineCovered:=", True,
+
+	if XSectionType == 1:
+		polyline_parameters = ["NAME:PolylineParameters","IsPolylineCovered:=", False,
 		"IsPolylineClosed:="	, True]
+	else:
+		polyline_parameters = ["NAME:PolylineParameters", "IsPolylineCovered:=", True,
+							   "IsPolylineClosed:=", True]
 
 	polyline_points=["NAME:PolylinePoints"]
 	polyline_segments=["NAME:PolylineSegments"]
@@ -54,17 +59,29 @@ def drawPolygon(oDesign, coords, units, names, Transparency, node_id_list = []):
 
 	polyline_parameters.append(polyline_points)
 	polyline_parameters.append(polyline_segments)
-	polyline_parameters.append([
-		"NAME:PolylineXSection",
-		"XSectionType:=", "None",
-		"XSectionOrient:=", "Auto",
-		"XSectionWidth:=", "0{0}".format(units),
-		"XSectionTopWidth:=", "0{0}".format(units),
-		"XSectionHeight:=", "0{0}".format(units),
-		"XSectionNumSegments:=", "0",
-		"XSectionBendType:=", "Corner"
-	])
 
+	if XSectionType == 1:
+		polyline_parameters.append([
+			"NAME:PolylineXSection",
+			"XSectionType:=", "Circle",
+			"XSectionOrient:=", "Auto",
+			"XSectionWidth:=", "{0}{1}".format(XSectionDiameter,units),
+			"XSectionTopWidth:=", "0{0}".format(units),
+			"XSectionHeight:=", "0{0}".format(units),
+			"XSectionNumSegments:=", "0",
+			"XSectionBendType:=", "Corner"
+		])
+	else:
+		polyline_parameters.append([
+			"NAME:PolylineXSection",
+			"XSectionType:=", "None",
+			"XSectionOrient:=", "Auto",
+			"XSectionWidth:=", "0{0}".format(units),
+			"XSectionTopWidth:=", "0{0}".format(units),
+			"XSectionHeight:=", "0{0}".format(units),
+			"XSectionNumSegments:=", "0",
+			"XSectionBendType:=", "Corner"
+		])
 
 	polyline_attributes = [
 		"NAME:Attributes",
